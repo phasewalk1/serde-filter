@@ -51,7 +51,7 @@ pub mod filters {
 ///  let values = filter::<Match<String>>(json, &Match::new("explanation")).unwrap();
 ///  assert_eq!(values, vec!["test".to_string()]);
 /// ```
-pub fn filter<F>(json: serde_json::Value, filter: &F) -> Result<Vec<F::Output>, anyhow::Error>
+pub fn filter<F>(json: serde_json::Value, filter: &F) -> Result<F::Output, anyhow::Error>
 where
     F: Filter,
 {

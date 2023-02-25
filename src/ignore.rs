@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Ignore {
@@ -11,61 +12,51 @@ impl Ignore {
         let keys = keys.into_iter().map(|s| s.to_string()).collect();
         Self { keys, values: None }
     }
+    pub fn sift(json: &serde_json::Value, ignore_keys: &HashSet<String>) -> serde_json::Value {
+        match json {
+            serde_json::Value::Null => json.clone(),
+            serde_json::Value::Bool(_) => json.clone(),
+            serde_json::Value::Number(_) => json.clone(),
+            serde_json::Value::String(_) => json.clone(),
+            serde_json::Value::Array(arr) => {
+                let filtered_arr: Vec<serde_json::Value> = arr
+                    .iter()
+                    .map(|v| Self::sift(v, ignore_keys))
+                    .filter(|v| !v.is_null())
+                    .collect();
+                serde_json::Value::Array(filtered_arr)
+            }
+            serde_json::Value::Object(map) => {
+                let filtered_map: serde_json::Map<String, serde_json::Value> = map
+                    .iter()
+                    .filter(|(k, _)| !&ignore_keys.contains(k.as_str()))
+                    .map(|(k, v)| (k.clone(), Self::sift(v, ignore_keys)))
+                    .filter(|(_, v)| !v.is_null())
+                    .collect();
+                serde_json::Value::Object(filtered_map)
+            }
+        }
+    }
 }
 
 impl super::prelude::Filter for Ignore {
     type Output = serde_json::Value;
-    fn filter(&self, json: serde_json::Value) -> Result<Vec<Self::Output>, anyhow::Error> {
-        let ignore_keys = self.keys.clone();
-        let mut result = Vec::new();
-        let mut stack = Vec::new();
-        stack.push(json);
-        while let Some(value) = stack.pop() {
-            match value {
-                serde_json::Value::Object(map) => {
-                    for (k, v) in map {
-                        if !ignore_keys.contains(&k) {
-                            if !v.is_null() {
-                                let mut map = serde_json::Map::new();
-                                map.insert(k, v);
-                                result.push(serde_json::Value::Object(map));
-                            }
-                        } else {
-                            stack.push(v);
-                        }
-                    }
-                }
-                serde_json::Value::Array(array) => {
-                    for v in array {
-                        stack.push(v);
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        let mut my_map = serde_json::Map::new();
-        let res_c = result.clone();
-        res_c.into_iter().for_each(|v| {
-            if let serde_json::Value::Object(map) = v {
-                for (k, v) in map {
-                    my_map.insert(k, v);
-                }
-            }
-        });
-
-        let result = vec![serde_json::Value::Object(my_map)];
-        Ok(result)
+    fn filter(&self, json: serde_json::Value) -> Result<Self::Output, anyhow::Error> {
+        let ignore_k = self.keys.clone();
+        let filtered = Ignore::sift(&json, &ignore_k.into_iter().collect());
+        Ok(filtered)
     }
 }
 
 #[cfg(test)]
 mod ignore_test {
+    use super::Ignore;
     use crate::filter;
+    use serde_json::json;
 
     #[test]
     fn test_ignore() {
-        let json = serde_json::json!(
+        let json = json!(
             {
                 "explanation": "test",
                 "media_type": "test",
@@ -75,13 +66,55 @@ mod ignore_test {
                 "msg": "test"
             }
         );
-        let values =
-            filter::<super::Ignore>(json, &super::Ignore::new(vec!["explanation", "media_type"]));
+        let values = filter::<Ignore>(json, &Ignore::new(vec!["explanation", "media_type"]));
         if let Ok(trimmed) = values {
-            assert!(trimmed[0].get("explanation").is_none());
-            assert!(trimmed[0].get("media_type").is_none());
+            println!("TRIMMED: {:#?}", trimmed);
+            assert!(trimmed.get("explanation").is_none());
+            assert!(trimmed.get("media_type").is_none());
+            assert!(trimmed.get("hdurl").is_some());
         } else {
             panic!();
         }
+
+        let json = json!({
+            "2020-01-01": {
+                "explanation": "test_1",
+                "media_type": "test",
+                "hdurl": "test",
+                "service_version": "test",
+                "code": 200,
+                "msg": "test"
+            },
+            "Object": {
+                "2023-01-11": {
+                    "Object": {
+                        "explanation": "test_3",
+                        "media_type": "test",
+                        "hdurl": "test",
+                        "service_version": "test",
+                        "code": 200,
+                        "msg": "test"
+                    },
+                    "explanation": "test_2",
+                }
+            },
+            "explanation": "test_0"
+        });
+
+        let ignore = Ignore::new(vec!["explanation"]);
+        let trimmed = filter::<Ignore>(json, &ignore).unwrap();
+        println!("TRIMMED: {:#?}", trimmed);
+        assert!(trimmed["2020-01-01"].get("explanation").is_none(), "test_1");
+        assert!(
+            trimmed["Object"]["2023-01-11"]["Object"]
+                .get("explanation")
+                .is_none(),
+            "test_3"
+        );
+        assert!(
+            trimmed["Object"]["2023-01-11"].get("explanation").is_none(),
+            "test_2"
+        );
+        assert!(trimmed.get("explanation").is_none(), "test_0");
     }
 }

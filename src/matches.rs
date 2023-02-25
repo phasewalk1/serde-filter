@@ -21,8 +21,8 @@ impl<M> crate::prelude::Filter for Match<M>
 where
     M: crate::prelude::Matchable,
 {
-    type Output = M;
-    fn filter(&self, json: serde_json::Value) -> Result<Vec<Self::Output>, anyhow::Error> {
+    type Output = Vec<M>;
+    fn filter(&self, json: serde_json::Value) -> Result<Self::Output, anyhow::Error> {
         let key = self.key.clone();
         let mut result = Vec::new();
         let mut stack = Vec::new();
