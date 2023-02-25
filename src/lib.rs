@@ -23,19 +23,19 @@
 //! }
 //! ```
 
+/// Common traits
+pub mod filter;
 /// The Ignore filter
 pub mod ignore;
 /// The Match filter
 pub mod matches;
-/// Common traits
-pub mod prelude;
-pub use prelude::{Filter, Matchable};
 
 /// Re-export filters
 pub mod filters {
     pub use super::filter;
+    pub use super::filter::Filter;
     pub use super::ignore::Ignore;
-    pub use super::matches::*;
+    pub use super::matches::{Match, Matchable};
 }
 
 /// Run a filter function on a JSON value
@@ -53,7 +53,7 @@ pub mod filters {
 /// ```
 pub fn filter<F>(json: serde_json::Value, filter: &F) -> Result<F::Output, anyhow::Error>
 where
-    F: Filter,
+    F: crate::filter::Filter,
 {
     filter.filter(json)
 }

@@ -39,7 +39,7 @@ impl Ignore {
     }
 }
 
-impl super::prelude::Filter for Ignore {
+impl super::filter::Filter for Ignore {
     type Output = serde_json::Value;
     fn filter(&self, json: serde_json::Value) -> Result<Self::Output, anyhow::Error> {
         let ignore_k = self.keys.clone();
