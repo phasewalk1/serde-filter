@@ -65,14 +65,63 @@ impl crate::prelude::Matchable for i64 {
     }
 }
 
-impl crate::prelude::Matchable for f32 {
+impl crate::prelude::Matchable for i32 {
     fn from_json(json: serde_json::Value) -> Option<Self> {
-        json.as_f64().map(|f| f as f32)
+        json.as_i64().map(|i| i as i32)
+    }
+}
+
+impl crate::prelude::Matchable for i16 {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        json.as_i64().map(|i| i as i16)
     }
 }
 
 impl crate::prelude::Matchable for u64 {
     fn from_json(json: serde_json::Value) -> Option<Self> {
         json.as_u64()
+    }
+}
+
+impl crate::prelude::Matchable for u32 {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        json.as_u64().map(|u| u as u32)
+    }
+}
+
+impl crate::prelude::Matchable for u16 {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        json.as_u64().map(|u| u as u16)
+    }
+}
+
+impl crate::prelude::Matchable for f64 {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        json.as_f64()
+    }
+}
+
+impl crate::prelude::Matchable for f32 {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        json.as_f64().map(|f| f as f32)
+    }
+}
+
+impl crate::prelude::Matchable for bool {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        json.as_bool()
+    }
+}
+
+impl crate::prelude::Matchable for (String, String) {
+    fn from_json(json: serde_json::Value) -> Option<Self> {
+        if let serde_json::Value::Object(map) = json {
+            if let (Some(k), Some(v)) = (map.get("key"), map.get("value")) {
+                if let (Some(k), Some(v)) = (k.as_str(), v.as_str()) {
+                    return Some((k.to_owned(), v.to_owned()));
+                }
+            }
+        }
+        None
     }
 }

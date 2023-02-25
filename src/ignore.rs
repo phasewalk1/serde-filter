@@ -61,11 +61,7 @@ impl super::prelude::Filter for Ignore {
 
 #[cfg(test)]
 mod ignore_test {
-    use super::*;
-    use crate::filters::filter;
-    use crate::prelude::Filter;
-    use nerva::clients::apod::*;
-    use nerva::prelude::*;
+    use crate::filter;
 
     #[test]
     fn test_ignore() {

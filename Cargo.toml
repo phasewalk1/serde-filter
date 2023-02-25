@@ -3,6 +3,14 @@ name = "serde-filter"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "serde_filter"
+path = "src/lib.rs"
+
+[[bin]]
+name = "example-match"
+path = "example/match.rs"
+
 [dependencies]
 anyhow = "1.0.69"
 serde = { version = "1.0.152", features = ["derive"] }

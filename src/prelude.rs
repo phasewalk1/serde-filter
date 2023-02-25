@@ -7,7 +7,7 @@ pub trait Filter {
 /// A Matchable type is a type that can be matched against a JSON value
 pub trait Matchable
 where
-    Self: std::fmt::Display
+    Self: std::fmt::Debug 
         + serde::Serialize
         + serde::de::DeserializeOwned
         + Clone

@@ -1,35 +1,56 @@
 #![feature(associated_type_defaults)]
 
-//! ```no_run
-//! use nerva::clients::donki::flr::*;
-//! use nerva::prelude::*;
+//! ```
 //! use serde_filter::prelude::*;
 //! use serde_filter::filters::*;
+//! use serde_json::json;
 //!
 //! fn main() {
-//!     let flr = FLR::default();
-//!     let params = FLRParams::default();
-//!     let response = flr.get(params).unwrap();
-//!     let values = filter::<Match<u64>>(response, &Match::new("activeRegionNum")).unwrap();
-//!     println!("{:?}", values)
+//!     let json = serde_json::json!({
+//!         "Object" : {
+//!                "explanation": "test",
+//!                "activeRegionNum": 9876897,
+//!          },
+//!          "2022": {
+//!              "Object" : {
+//!                  "explanation": "test",
+//!                  "activeRegionNum": 1380402,
+//!              }
+//!          }
+//!      });
+//!      let nums: Vec<u64> = filter::<Match<u64>>(json, &Match::new("activeRegionNum")).unwrap();
+//!      assert_eq!(nums, vec![9876897, 1380402]);
 //! }
 //! ```
 
+/// The Ignore filter
 pub mod ignore;
 /// The Match filter
 pub mod matches;
 /// Common traits
 pub mod prelude;
-
 pub use prelude::{Filter, Matchable};
-/// Common filters
+
+/// Re-export filters
 pub mod filters {
     pub use super::filter;
+    pub use super::ignore::Ignore;
     pub use super::matches::*;
-    pub use super::Filter;
 }
 
-/// AdHoc filter function
+/// Run a filter function on a JSON value
+/// ### Example
+/// ```no_run
+/// use serde_filter::{filters::*, prelude::*};
+///  let json = serde_json::json!({
+///      "explanation": "test",
+///      "date": "2020-01-01",
+///      "title": "test",
+///       "url": "test",
+///  });
+///  let values = filter::<Match<String>>(json, &Match::new("explanation")).unwrap();
+///  assert_eq!(values, vec!["test".to_string()]);
+/// ```
 pub fn filter<F>(json: serde_json::Value, filter: &F) -> Result<Vec<F::Output>, anyhow::Error>
 where
     F: Filter,
