@@ -1,11 +1,21 @@
 #![feature(associated_type_defaults)]
 
+//! # Overview
+//! `serde_filter` is a library crate that provides filtering abstractions for JSON objects and arrays
+//! using `serde` as a backend. It allows you to easily filter and transform complex JSON structures by
+//! providing a set of configurable filters.
+//!
+//! The crate provides a number of out-of-the-box filters for common use cases, such as filtering by key
+//! or value, flattening nested objects and arrays, and more. You can also implement your own filters
+//! by implementing the `Filter` trait.
+//!
+//! ## Using Pre-Built Filters
 //! ```
 //! use serde_filter::prelude::*;
 //! use serde_filter::filters::*;
 //! use serde_json::json;
 //!
-//! fn main() {
+//! fn main() where {
 //!     let json = serde_json::json!({
 //!         "Object" : {
 //!                "explanation": "test",
@@ -30,17 +40,20 @@ pub mod ignore;
 /// The Match filter
 pub mod matches;
 
+pub mod flatten;
+
 /// Re-export filters
-pub mod filters {
+pub mod prelude {
     pub use super::filter::filter;
     pub use super::filter::Filter;
+    pub use super::flatten::Flatten;
     pub use super::ignore::Ignore;
     pub use super::matches::{Match, Matchable};
 }
 
 #[cfg(test)]
 mod filter_test {
-    use super::filters::*;
+    use super::prelude::{filter, Match};
 
     #[test]
     fn test_match() {

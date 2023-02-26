@@ -51,7 +51,7 @@ impl super::filter::Filter for Ignore {
 #[cfg(test)]
 mod ignore_test {
     use super::Ignore;
-    use crate::filters::*;
+    use crate::prelude::filter;
     use serde_json::json;
 
     #[test]

@@ -1,32 +1,53 @@
-# serde_filter
+# Overview
 
-Generic filtering abstractions over json objects (`serde_json::Value`).
+`serde_filter` is a library crate that provides filtering abstractions for JSON objects and arrays
+using `serde` as a backend. It allows you to easily filter and transform complex JSON structures by providing a set of configurable filters.
 
-## Usage
+The crate provides a number of out-of-the-box filters for common use cases, such as filtering by key or value, flattening nested objects and arrays, and more. You can also implement your own filters by implementing the `Filter` trait.
 
-### AdHoc Filters, and the `filter` Function
-
-_AdHoc_ filters are filters that are defined inline instead of built with a custom configuration. Perhaps the most powerful AdHoc filter, is the `Match` filter. The `Match` filter is a type of filter that wraps a `T` and returns a vector of the underlying type. Simply, a `Match` filter serves to only return values if they match a certain key and can serialize into `T`.
-Assume we've just queried some endpoint at some server that returns a large, nested JSON object. Within every nested object, there is a field "activeRegionNum" that contains an unsigned integer that we want to collect. Let's see how we can use the `filter` function with the `Match` filter to create an AdHoc filter.
+## Using Pre-Built Filters
 
 ```Rust
 use serde_json::json;
-use serde_filter::{prelude::*, filters::*};
+use serde_filter::prelude::*;
 
 fn main() where {
+    // ******* Match Filter ********
     let json = json!({
-        "Object": {
-            "explanation": "test explanation",
-            "activeRegionNum": 23
+        "Object" : {
+            "explanation": "test",
+            "activeRegionNum": 9876897,
         },
-        "2022-01-11": {
-            "Object2": {
-                "explanation": "none",
-                "activeRegionNum": 98
+        "2022": {
+            "Object" : {
+                "explanation": "test",
+                "activeRegionNum": 1380402,
             }
         }
     });
-    let nums = filter::<Match<u64>>(json, &Match::new("activeRegionNum")).unwrap();
-    assert_eq!(vec![23 as u64, 98 as u64], nums);
+    let nums = filter::<Match<u64>>(json, &Match::new("activeRegionNum"));
+    if let Ok(n) = nums {
+        assert_eq!(nums, vec![9876897, 1380402]);
+    }
+    // ******** Flatten Filter *********
+    let json = serde_json::json!({
+        "a": {
+            "b": {
+                "c": {
+                    "d": "value"
+                }
+            }
+        },
+        "e": "value"
+    });
+    
+    let expected = serde_json::json!({
+        "a.b.c.d": "value",
+        "e": "value"
+    });
+
+    let result = filter::<Flatten>(json, &Flatten::default()).unwrap();
+    println!("{:?}", result);
+    assert_eq!(result, expected);
 }
 ```

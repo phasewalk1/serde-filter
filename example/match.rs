@@ -1,6 +1,6 @@
 extern crate serde_filter;
 extern crate serde_json;
-use serde_filter::filters::*;
+use serde_filter::prelude::*;
 use serde_json::json;
 
 fn main() {
