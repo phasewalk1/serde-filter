@@ -12,7 +12,6 @@
 //! ## Using Pre-Built Filters
 //! ```
 //! use serde_filter::prelude::*;
-//! use serde_filter::filters::*;
 //! use serde_json::json;
 //!
 //! fn main() where {
@@ -29,18 +28,40 @@
 //!          }
 //!      });
 //!      let nums: Vec<u64> = filter::<Match<u64>>(json, &Match::new("activeRegionNum")).unwrap();
-//!      assert_eq!(nums, vec![9876897, 1380402]);
+//!      assert_eq!(nums, vec![9876897u64, 1380402u64]);
 //! }
 //! ```
 
-/// Common traits
+/// The Filter trait and Adhoc filter function
 pub mod filter;
+/// Flattens a JSON object into a single level
+/// ### Example
+/// ```no_run
+/// let json = serde_json::json!({
+///       "a": {
+///       	  "b": {
+///			      "c": {
+///                   "d": "value"
+///                }
+///            }
+///        },
+///        "e": "value"
+///        });
+///        
+///	let expected = serde_json::json!({
+/// 	"a.b.c.d": "value",
+///     "e": "value"
+/// });
+///
+/// let flattener = Flattener::default(); // default delimiter is '.'
+/// let result = filter::<Flatten>(json, &flattener).unwrap();
+/// println!("{:?}", result);
+/// assert_eq!(result, expected);
+pub mod flatten;
 /// The Ignore filter
 pub mod ignore;
 /// The Match filter
 pub mod matches;
-
-pub mod flatten;
 
 /// Re-export filters
 pub mod prelude {

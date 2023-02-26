@@ -97,6 +97,7 @@ mod flatten_test {
           },
           "e": "value"
         });
+
         let expected = serde_json::json!({
           "a.b.c.d": "value",
           "e": "value"

@@ -18,4 +18,5 @@ fn main() {
     });
     let nums = filter::<Match<u64>>(json, &Match::new("activeRegionNum")).unwrap();
     assert_eq!(vec![23 as u64, 98 as u64], nums);
+    dbg!(nums);
 }

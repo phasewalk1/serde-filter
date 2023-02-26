@@ -7,9 +7,17 @@ edition = "2021"
 name = "serde_filter"
 path = "src/lib.rs"
 
-[[bin]]
-name = "example-match"
+[[example]]
+name = "match"
 path = "example/match.rs"
+
+[[example]]
+name = "flatten"
+path = "example/flattener.rs"
+
+[[example]]
+name = "ignore"
+path = "example/ignore.rs"
 
 [dependencies]
 anyhow = "1.0.69"

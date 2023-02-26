@@ -27,7 +27,7 @@ fn main() where {
     });
     let nums = filter::<Match<u64>>(json, &Match::new("activeRegionNum"));
     if let Ok(n) = nums {
-        assert_eq!(nums, vec![9876897, 1380402]);
+        assert_eq!(nums, vec![9876897 as u64, 1380402 as u64]);
     }
     // ******** Flatten Filter *********
     let json = serde_json::json!({

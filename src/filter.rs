@@ -1,13 +1,13 @@
-/// A Filter transforms a JSON value into a Vec of a specific type
+/// A Filter transforms a JSON value into a Filter::Output
 pub trait Filter {
     type Output;
     fn filter(&self, json: serde_json::Value) -> Result<Self::Output, anyhow::Error>;
 }
 
-/// Run a filter function on a JSON value
+/// Runs a filter function on a JSON value
 /// ### Example
 /// ```no_run
-/// use serde_filter::{filters::*, prelude::*};
+/// use serde_filter::prelude::*;
 ///  let json = serde_json::json!({
 ///      "explanation": "test",
 ///      "date": "2020-01-01",
