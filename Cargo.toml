@@ -2,6 +2,11 @@
 name = "serde-filter"
 version = "0.1.0"
 edition = "2021"
+description = "Generic filtering abstractions over serde json payloads"
+categories = ["json", "serde", "parsing", "filtering", "parser", "filter"]
+documentation = "https://docs.rs/serde-filter"
+repository = "https://github.com/phasewalk1/serde-filter"
+license = "MIT"
 
 [lib]
 name = "serde_filter"
