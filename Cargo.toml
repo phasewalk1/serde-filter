@@ -1,8 +1,8 @@
 [package]
 name = "serde-filter"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
-description = "Generic filtering abstractions over serde json payloads"
+description = "filtering abstractions for JSON objects and deeply nested arrays using serde as a backend"
 categories = ["json", "serde", "parsing", "filtering"]
 documentation = "https://docs.rs/serde-filter"
 repository = "https://github.com/phasewalk1/serde-filter"
