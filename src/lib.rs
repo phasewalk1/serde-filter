@@ -89,7 +89,7 @@ mod filter_test {
             "code": 200,
             "msg": "test"
         });
-        let values = filter::<Match<String>>(json, &Match::new("explanation")).unwrap();
+        let values = filter::<Match<String>>(json.clone(), &Match::new("explanation")).unwrap();
         assert_eq!(values, vec!["test".to_string()]);
 
         let json = serde_json::json!({
