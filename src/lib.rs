@@ -32,30 +32,10 @@ pub mod matches;
 
 /// Re-export filters
 pub mod filters {
-    pub use super::filter;
+    pub use super::filter::filter;
     pub use super::filter::Filter;
     pub use super::ignore::Ignore;
     pub use super::matches::{Match, Matchable};
-}
-
-/// Run a filter function on a JSON value
-/// ### Example
-/// ```no_run
-/// use serde_filter::{filters::*, prelude::*};
-///  let json = serde_json::json!({
-///      "explanation": "test",
-///      "date": "2020-01-01",
-///      "title": "test",
-///       "url": "test",
-///  });
-///  let values = filter::<Match<String>>(json, &Match::new("explanation")).unwrap();
-///  assert_eq!(values, vec!["test".to_string()]);
-/// ```
-pub fn filter<F>(json: serde_json::Value, filter: &F) -> Result<F::Output, anyhow::Error>
-where
-    F: crate::filter::Filter,
-{
-    filter.filter(json)
 }
 
 #[cfg(test)]
