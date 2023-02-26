@@ -37,6 +37,8 @@ pub mod filter;
 /// Flattens a JSON object into a single level
 /// ### Example
 /// ```no_run
+/// use serde_filter::prelude::*;
+/// 
 /// let json = serde_json::json!({
 ///       "a": {
 ///       	  "b": {
@@ -53,7 +55,7 @@ pub mod filter;
 ///     "e": "value"
 /// });
 ///
-/// let flattener = Flattener::default(); // default delimiter is '.'
+/// let flattener = Flatten::default(); // default delimiter is '.'
 /// let result = filter::<Flatten>(json, &flattener).unwrap();
 /// println!("{:?}", result);
 /// assert_eq!(result, expected);
